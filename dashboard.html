@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Logistics Dashboard ()</title>
+  <style>
+    body { font-family: Arial; margin:0; background:#f4f6f9; }
+
+    .header {
+      background:#111827;
+      color:white;
+      padding:15px;
+      font-size:18px;
+    }
+
+    .container { max-width:900px; margin:20px auto; padding:20px; }
+
+    input, button {
+      padding:10px;
+      margin:5px 0;
+      width:100%;
+    }
+
+    button {
+      background:#111827;
+      color:white;
+      border:none;
+      cursor:pointer;
+    }
+
+    .card {
+      background:white;
+      padding:15px;
+      margin-top:15px;
+      border-left:5px solid #3b82f6;
+    }
+
+    .admin {
+      background:#fff;
+      padding:15px;
+      margin-top:30px;
+      border:2px dashed #111827;
+    }
+
+    .hidden { display:none; }
+
+    .timeline { margin-top:10px; }
+    .event { padding:8px; border-bottom:1px solid #eee; }
+  </style>
+</head>
+
+<body>
+
+<div class="header">
+  Delivery Tracking System
+</div>
+
+<div class="container">
+
+  <h3>Track Package</h3>
+  <input id="trackInput" placeholder="Enter Tracking Number">
+  <button onclick="track()">Track</button>
+
+  <div id="result"></div>
+
+  <hr>
+
+  <h3>Admin Panel</h3>
+  <input id="adminPass" placeholder="Enter Admin Password">
+  <button onclick="login()">Login</button>
+
+  <div id="adminPanel" class="hidden admin">
+
+    <h4>Add / Update Tracking</h4>
+
+    <input id="tNo" placeholder="Tracking Number">
+    <input id="tStatus" placeholder="Status">
+    <input id="tLocation" placeholder="Location">
+    <input id="tDate" placeholder="Date">
+
+    <button onclick="save()">Save Update</button>
+
+  </div>
+
+</div>
+
+<script>
+
+let db = JSON.parse(localStorage.getItem("db")) || {};
+
+function track() {
+  let id = document.getElementById("trackInput").value;
+  let res = document.getElementById("result");
+
+  if(db[id]) {
+    let html = `<div class="card">
+      <h4>Tracking: ${id}</h4>
+    `;
+
+    db[id].forEach(u => {
+      html += `
+        <div class="event">
+          <b>${u.status}</b><br>
+          📍 ${u.location}<br>
+          📅 ${u.date}
+        </div>
+      `;
+    });
+
+    html += "</div>";
+    res.innerHTML = html;
+
+  } else {
+    res.innerHTML = "<p style='color:red;'>No tracking data found</p>";
+  }
+}
+
+function login() {
+  let pass = document.getElementById("adminPass").value;
+  if(pass === "admin123") {
+    document.getElementById("adminPanel").classList.remove("hidden");
+  } else {
+    alert("Wrong password");
+  }
+}
+
+function save() {
+  let id = document.getElementById("tNo").value;
+  let status = document.getElementById("tStatus").value;
+  let location = document.getElementById("tLocation").value;
+  let date = document.getElementById("tDate").value;
+
+  if(!db[id]) db[id] = [];
+
+  db[id].push({status, location, date});
+
+  localStorage.setItem("db", JSON.stringify(db));
+
+  alert("Saved!");
+}
+
+</script>
+
+</body>
+</html>
